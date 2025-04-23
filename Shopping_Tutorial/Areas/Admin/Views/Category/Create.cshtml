@@ -1,0 +1,37 @@
+﻿@model CategoryModel
+@{
+	ViewData["title"] = "Thêm danh mục";
+}
+<h4>Thêm sản phẩm</h4>
+<div class="col-md-9">
+	<form asp-action="Create" enctype="multipart/form-data">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<div class="form-group">
+			<label>Tên sản phẩm</label>
+			<input asp-for="Name" class="form-control" />
+			<span asp-validation-for="Name" class="text-danger" />
+		</div>
+
+
+		<div class="form-group">
+			<label>Mô tả</label>
+			<textarea asp-for="Description" class="form-control"></textarea>
+			<span asp-validation-for="Description" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<button class="btn btn-primary">Tạo</button>
+		</div>
+	</form>
+	<a asp-action="Index">Trở lại Danh sách sản phẩm</a>
+</div>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+	<script>
+		CKEDITOR.replace( 'Description' );
+	</script>
+}
