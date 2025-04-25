@@ -7,24 +7,24 @@ using Shopping_Tutorial.Repository;
 namespace Shopping_Tutorial.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize ]
-public class CategoryController : Controller
+[Authorize]
+public class BrandController : Controller
 {
     private readonly DataContext _dataContext;
-    public CategoryController(DataContext context)
+    public BrandController(DataContext context)
     {
         _dataContext = context;
     }
 
     public async Task<IActionResult> Index()
     {
-        return View(await _dataContext.Categories.OrderByDescending(p => p.Id).ToArrayAsync());
+        return View(await _dataContext.Brands.OrderByDescending(p => p.Id).ToArrayAsync());
     }
 
     public async Task<IActionResult> Edit(int Id)
     {
-        CategoryModel category = await _dataContext.Categories.FindAsync(Id);
-        return View(category);
+        BrandModel brand = await _dataContext.Brands.FindAsync(Id);
+        return View(brand);
     }
 
     public async Task<IActionResult> Create()
@@ -34,20 +34,20 @@ public class CategoryController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CategoryModel category)
+    public async Task<IActionResult> Create(BrandModel Brand)
     {
         if (ModelState.IsValid)
         {
-            category.Slug = category.Name.Replace(" ", "-");
-            var slug = await _dataContext.Categories.FirstOrDefaultAsync(p => p.Slug == category.Slug);
+            Brand.Slug = Brand.Name.Replace(" ", "-");
+            var slug = await _dataContext.Brands.FirstOrDefaultAsync(p => p.Slug == Brand.Slug);
             if (slug != null)
             {
-                ModelState.AddModelError("", "Danh mục đã có trong database");
-                return View(category);
+                ModelState.AddModelError("", "Thương hiệu đã có trong database");
+                return View(Brand);
             }
-            _dataContext.Add(category);
+            _dataContext.Add(Brand);
             await _dataContext.SaveChangesAsync();
-            TempData["success"] = "Thêm danh mục thành công";
+            TempData["success"] = "Thêm Thương hiệu thành công";
             return RedirectToAction("Index");
         }
 
@@ -65,25 +65,25 @@ public class CategoryController : Controller
             string errorMessage = string.Join("\n", errors);
             return BadRequest(errorMessage);
         }
-        return View(category);
+        return View(Brand);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(CategoryModel category)
+    public async Task<IActionResult> Edit(BrandModel Brand)
     {
         if (ModelState.IsValid)
         {
-            category.Slug = category.Name.Replace(" ", "-");
-            var slug = await _dataContext.Categories.FirstOrDefaultAsync(p => p.Slug == category.Slug);
+            Brand.Slug = Brand.Name.Replace(" ", "-");
+            var slug = await _dataContext.Brands.FirstOrDefaultAsync(p => p.Slug == Brand.Slug);
             if (slug != null)
             {
-                ModelState.AddModelError("", "Danh mục đã có trong database");
-                return View(category);
+                ModelState.AddModelError("", "Thương hiệu đã có trong database");
+                return View(Brand);
             }
-            _dataContext.Update(category);
+            _dataContext.Update(Brand);
             await _dataContext.SaveChangesAsync();
-            TempData["success"] = "Sửa danh mục thành công";
+            TempData["success"] = "Sửa Thương hiệu thành công";
             return RedirectToAction("Index");
         }
 
@@ -101,17 +101,17 @@ public class CategoryController : Controller
             string errorMessage = string.Join("\n", errors);
             return BadRequest(errorMessage);
         }
-        return View(category);
+        return View(Brand);
     }
 
     public async Task<IActionResult> Delete(int Id)
     {
-        CategoryModel category = await _dataContext.Categories.FindAsync(Id);
-        _dataContext.Categories.Remove(category);
+        BrandModel brand = await _dataContext.Brands.FindAsync(Id);
+        _dataContext.Brands.Remove(brand);
         await _dataContext.SaveChangesAsync();
-        TempData["success"] = "Danh mục đã xóa thành công";
+        TempData["success"] = "Thương hiệu đã xóa thành công";
         return RedirectToAction("Index");
     }
-    
+
 
 }

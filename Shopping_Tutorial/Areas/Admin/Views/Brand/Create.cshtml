@@ -1,13 +1,13 @@
-﻿@model CategoryModel
+﻿@model BrandModel
 @{
-	ViewData["title"] = "Thêm danh mục";
+	ViewData["title"] = "Thêm thương hiệu";
 }
-<h4>Thêm danh mục</h4>
+<h4>Thêm thương hiệu</h4>
 <div class="col-md-9">
 	<form asp-action="Create" enctype="multipart/form-data">
 		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 		<div class="form-group">
-			<label>Tên danh mục</label>
+			<label>Tên thương hiệu</label>
 			<input asp-for="Name" class="form-control" />
 			<span asp-validation-for="Name" class="text-danger" />
 		</div>
@@ -39,4 +39,4 @@
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
- }
+}

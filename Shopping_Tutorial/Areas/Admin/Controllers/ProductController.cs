@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shopping_Tutorial.Models;
@@ -7,7 +8,7 @@ using Shopping_Tutorial.Repository;
 namespace Shopping_Tutorial.Areas.Admin.Controllers;
 
 [Area("Admin")]
-
+[Authorize]
 public class ProductController : Controller
 {
     private readonly DataContext _dataContext;
@@ -59,7 +60,7 @@ public class ProductController : Controller
             }
             _dataContext.Add(product);
             await _dataContext.SaveChangesAsync();
-            TempData["error"] = "Thêm sản phẩm thành công";
+            TempData["success"] = "Thêm sản phẩm thành công";
             return RedirectToAction("Index");
         }
 
@@ -145,7 +146,7 @@ public class ProductController : Controller
 
             _dataContext.Update(existed_product);
             await _dataContext.SaveChangesAsync();
-            TempData["error"] = "Cập nhật sản phẩm thành công";
+            TempData["success"] = "Cập nhật sản phẩm thành công";
             return RedirectToAction("Index");
         }
 
@@ -190,7 +191,7 @@ public class ProductController : Controller
         }
         _dataContext.Products.Remove(product);
         await _dataContext.SaveChangesAsync();
-        TempData["error"] = "Sản phẩm đã xóa thành công";
+        TempData["success"] = "Sản phẩm đã xóa thành công";
         return RedirectToAction("Index");
     }
 

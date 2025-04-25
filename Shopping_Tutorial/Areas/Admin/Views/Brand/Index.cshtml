@@ -1,14 +1,14 @@
-﻿@model IEnumerable<CategoryModel>
+﻿@model IEnumerable<BrandModel>
 @{
-    ViewData["title"] = "Danh sách danh mục";
+    ViewData["title"] = "Danh sách thương hiệu";
 }
-<h3>Danh sách danh mục</h3>
-<a asp-action="Create" asp-controller="Category">Thêm danh mục</a>
+<h3>Danh sách thương hiệu</h3>
+<a asp-action="Create" asp-controller="Brand">Thêm thương hiệu</a>
 <table class="table">
     <thead>
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">Tên danh mục</th>
+            <th scope="col">Tên thương hiệu</th>
             <th scope="col">Mô tả</th>
             <th scope="col">Từ khóa</th>
             <th scope="col">Trạng thái</th>
@@ -36,8 +36,8 @@
                 </td>
 
                 <td>
-                    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Category" asp-route-Id="@item.Id">Sửa</a>
-                    <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Category" asp-route-Id="@item.Id">Xóa</a>
+                    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Brand" asp-route-Id="@item.Id">Sửa</a>
+                    <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Brand" asp-route-Id="@item.Id">Xóa</a>
                 </td>
             </tr>
         }
