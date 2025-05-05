@@ -2,7 +2,7 @@
 
     if ($("a.confirmDeletion").length) {
         $("a.confirmDeletion").click(() => {
-            if (!confirm("Confirm deletion")) return false;
+            if (!confirm("Bạn xác nhận xóa?")) return false;
         });
     }
 

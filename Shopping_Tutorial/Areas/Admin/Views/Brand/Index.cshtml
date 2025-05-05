@@ -41,5 +41,35 @@
                 </td>
             </tr>
         }
+
+        @if (ViewBag.Pager != null)
+        {
+            var pager = ViewBag.Pager as Paginate;
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @if (pager.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage - 1)">Trước</a>
+                        </li>
+                    }
+
+                    @for (int i = pager.StartPage; i <= pager.EndPage; i++)
+                    {
+                        <li class="page-item @(i == pager.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="?pg=@i">@i</a>
+                        </li>
+                    }
+
+                    @if (pager.CurrentPage < pager.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage + 1)">Sau</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
     </tbody>
 </table>

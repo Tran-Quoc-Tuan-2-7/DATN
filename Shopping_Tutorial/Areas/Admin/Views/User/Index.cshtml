@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["title"] = "Danh sách người dùng";
+}
+<h3>Danh sách người dùng</h3>
+<a asp-action="Create" asp-controller="User">Thêm người dùng</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Tên người dùng</th>
+            <th scope="col">Email</th>
+            @* <th scope="col">Password Hash</th> *@
+            <th scope="col">Số điện thoại</th>
+            <th scope="col">Quyền</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var userWithRoles in Model)
+        {
+            <tr>
+                <th>@userWithRoles.User.Id</th>
+                <th scope="row">@userWithRoles.User.UserName</th>
+                <td>@userWithRoles.User.Email</td>
+                <td>@userWithRoles.User.PhoneNumber</td>
+                <td>@userWithRoles.RoleName</td>
+
+                <td>
+                    @if(userWithRoles.User.Id != ViewBag.loggerInUserId)
+                    {
+                        @if (userWithRoles.RoleName != "Admin")
+                        {
+                            <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="User" asp-route-Id="@userWithRoles.User.Id">Sửa</a>
+                            <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="User" asp-route-Id="@userWithRoles.User.Id">Xóa</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

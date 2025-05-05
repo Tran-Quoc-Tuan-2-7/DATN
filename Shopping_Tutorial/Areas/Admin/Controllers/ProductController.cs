@@ -8,7 +8,7 @@ using Shopping_Tutorial.Repository;
 namespace Shopping_Tutorial.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class ProductController : Controller
 {
     private readonly DataContext _dataContext;

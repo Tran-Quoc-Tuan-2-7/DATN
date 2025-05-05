@@ -7,7 +7,7 @@ using Shopping_Tutorial.Repository;
 namespace Shopping_Tutorial.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize]
+[Authorize(Roles = "Admin, Author")]
 public class BrandController : Controller
 {
     private readonly DataContext _dataContext;
@@ -16,10 +16,37 @@ public class BrandController : Controller
         _dataContext = context;
     }
 
-    public async Task<IActionResult> Index()
+    [Route("Index")]
+    public async Task<IActionResult> Index(int pg = 1)
     {
-        return View(await _dataContext.Brands.OrderByDescending(p => p.Id).ToArrayAsync());
+        List<BrandModel> brand = _dataContext.Brands.ToList(); //33 datas
+
+
+        const int pageSize = 10; //10 items/trang
+
+        if (pg < 1) //page < 1;
+        {
+            pg = 1; //page ==1
+        }
+        int recsCount = brand.Count(); //33 items;
+
+        var pager = new Paginate(recsCount, pg, pageSize);
+
+        int recSkip = (pg - 1) * pageSize; //(3 - 1) * 10; 
+
+        //Brand.Skip(20).Take(10).ToList()
+
+        var data = brand.Skip(recSkip).Take(pager.PageSize).ToList();
+
+        ViewBag.Pager = pager;
+
+        return View(data);
     }
+
+    //public async Task<IActionResult> Index()
+    //{
+    //    return View(await _dataContext.Brands.OrderByDescending(p => p.Id).ToArrayAsync());
+    //}
 
     public async Task<IActionResult> Edit(int Id)
     {
@@ -65,7 +92,6 @@ public class BrandController : Controller
             string errorMessage = string.Join("\n", errors);
             return BadRequest(errorMessage);
         }
-        return View(Brand);
     }
 
     [HttpPost]
@@ -101,7 +127,6 @@ public class BrandController : Controller
             string errorMessage = string.Join("\n", errors);
             return BadRequest(errorMessage);
         }
-        return View(Brand);
     }
 
     public async Task<IActionResult> Delete(int Id)
