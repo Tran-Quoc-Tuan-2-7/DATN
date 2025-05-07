@@ -38,12 +38,12 @@
 					<img src="images/product-details/new.jpg" class="newarrival" alt="" />
 					<h2>@Model.Name</h2>
 					<span>
-						<span>US @Model.Price</span>
+						<span>@Model.Price.ToString("#, ##0 VNĐ")</span>
 						<label>Quantity: 1</label>
 						<input type="text" value="3" />
 						<button type="button" class="btn btn-fefault cart">
 							<i class="fa fa-shopping-cart"></i>
-							Add to cart
+							Thêm giỏ hàng
 						</button>
 					</span>
 					<p><b>Availability:</b> In Stock</p>

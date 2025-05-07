@@ -4,7 +4,7 @@
 }
 <h3>Danh sách sản phẩm</h3>
 <a asp-action="Create" asp-controller="Product">Thêm sản phẩm</a>
-<table class="table">
+<table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">Id</th>
@@ -28,13 +28,43 @@
             <td>@item.Price</td>
             <td><img src="~/media/products/@item.Image" width="100" height="80" /></td>
             <td>@item.Slug</td>
-            <td>@item.Category.Name</td>
-            <td>@item.Brand.Name</td>
+            <td>@(item.Category != null ? item.Category.Name : "Không rõ")</td>
+            <td>@(item.Brand != null ? item.Brand.Name : "Không rõ")</td>
+
             <td>
                 <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Product" asp-route-Id="@item.Id">Sửa</a>
                     <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Product" asp-route-Id="@item.Id">Xóa</a>
             </td>
             </tr>
+        }
+
+        @if (ViewBag.Pager != null)
+        {
+            var pager = ViewBag.Pager as Paginate;
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @if (pager.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage - 1)">Trước</a>
+                        </li>
+                    }
+
+                    @for (int i = pager.StartPage; i <= pager.EndPage; i++)
+                    {
+                        <li class="page-item @(i == pager.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="?pg=@i">@i</a>
+                        </li>
+                    }
+
+                    @if (pager.CurrentPage < pager.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage + 1)">Sau</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </tbody>
 </table>

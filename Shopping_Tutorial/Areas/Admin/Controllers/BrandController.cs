@@ -16,7 +16,7 @@ public class BrandController : Controller
         _dataContext = context;
     }
 
-    [Route("Index")]
+    //[Route("Index")]
     public async Task<IActionResult> Index(int pg = 1)
     {
         List<BrandModel> brand = _dataContext.Brands.ToList(); //33 datas

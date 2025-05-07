@@ -37,7 +37,7 @@
 									<h4><a href="">@item.ProductName</a></h4>
 								</td>
 								<td class="cart_price">
-									<p>@item.Price</p>
+									<h2>@item.Price.ToString("#, ##0 VNĐ")</h2>
 								</td>
 								<td >
 									<a class="btn btn-succses btn-sm" asp-controller ="Cart" asp-action="Increase" asp-route-id="@item.ProductId"> + </a>

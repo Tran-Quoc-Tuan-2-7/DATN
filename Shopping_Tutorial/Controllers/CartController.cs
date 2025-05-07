@@ -144,5 +144,29 @@ namespace Shopping_Tutorial.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddAjax(int Id)
+        {
+            ProductModel product = await _dataContext.Products.FindAsync(Id);
+
+            if (product == null)
+                return Json(new { success = false, message = "Không tìm thấy sản phẩm." });
+
+            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+
+            CartItemModel cartItem = cart.FirstOrDefault(c => c.ProductId == Id);
+
+            if (cartItem == null)
+                cart.Add(new CartItemModel(product));
+            else
+                cartItem.Quantity += 1;
+
+            HttpContext.Session.SetJson("Cart", cart);
+
+            return Json(new { success = true, message = "Đã thêm sản phẩm vào giỏ hàng!" });
+        }
+
     }
+
+
 }

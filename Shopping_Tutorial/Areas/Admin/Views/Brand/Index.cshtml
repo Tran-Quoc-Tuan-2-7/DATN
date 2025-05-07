@@ -4,7 +4,7 @@
 }
 <h3>Danh sách thương hiệu</h3>
 <a asp-action="Create" asp-controller="Brand">Thêm thương hiệu</a>
-<table class="table">
+<table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">Id</th>
@@ -12,6 +12,8 @@
             <th scope="col">Mô tả</th>
             <th scope="col">Từ khóa</th>
             <th scope="col">Trạng thái</th>
+            <th scope="col">Hành động</th>
+
         </tr>
     </thead>
     <tbody>
@@ -33,12 +35,16 @@
                         <span class="text-area text-danger">Ẩn</span>
 
                     }
+                    
                 </td>
 
                 <td>
                     <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Brand" asp-route-Id="@item.Id">Sửa</a>
                     <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Brand" asp-route-Id="@item.Id">Xóa</a>
                 </td>
+
+               
+
             </tr>
         }
 

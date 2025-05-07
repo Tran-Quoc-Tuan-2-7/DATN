@@ -4,7 +4,7 @@
 </div>
 <style>
 	.product-image-wapper{
-		height: 450px;
+	height: 450px;
 	}
 </style>
 
@@ -16,21 +16,27 @@
 		{
 			<div class="col-sm-4">
 				<div class="product-image-wrapper">
-					
+
 					<div class="single-products">
 						<div class="productinfo text-center">
 							<a asp-action="Details" asp-controller="Product" asp-route-id="@item.Id">
-							<img src="~/media/products/@item.Image" alt="@item.Name" width="100%" />
-							<h2>@item.Price</h2>
-							<p>@item.Name</p>
-							<p>Danh mục: @item.Category.Name</p>
-							<p>Thương hiệu: @item.Brand.Name</p>
+								<img src="~/media/products/@item.Image" alt="@item.Name" width="100%" />
+								<h2>@item.Price.ToString("#, ##0 VNĐ")</h2>
+								<p>@item.Name</p>
+								<p>Danh mục: @item.Category.Name</p>
+								<p>Thương hiệu: @item.Brand.Name</p>
 							</a>
-							<a class="btn btn-default add-to-cart" asp-action="Add" asp-controller="Cart" asp-route-id="@item.Id"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+							@* <a class="btn btn-default add-to-cart" asp-action="Add" asp-controller="Cart" asp-route-id="@item.Id"><i class="fa fa-shopping-cart"></i>Add to cart</a> *@
+							<button type="button" class="btn btn-fefault cart add-to-cart" data-product-id="@item.Id">
+								<i class="fa fa-shopping-cart"></i>
+								Add to cart
+							</button>
+
+
 						</div>
 
 					</div>
-					
+
 					<div class="choose">
 						<ul class="nav nav-pills nav-justified">
 							<li><a href="#"><i class="fa fa-plus-square"></i>Add to wishlist</a></li>
@@ -39,4 +45,38 @@
 					</div>
 				</div>
 			</div>
+		}
+
+		@section Scripts {
+			<script>
+								$(document).ready(function () {
+					$(".add-to-cart").click(function (e) {
+						e.preventDefault();
+						var id = $(this).data("product-id");  // Lấy ID từ data-product-id
+
+						$.ajax({
+							type: "POST",
+							url: "@Url.Action("AddAjax", "Cart")",  // Đảm bảo đúng route
+							data: { Id: id },  // Gửi ID lên server
+							success: function (response) {
+								if (response.success) {
+									Swal.fire({
+										icon: "success",
+										title: "Thành công",
+										text: response.message,
+										timer: 1500,
+										showConfirmButton: false
+									});
+								} else {
+									Swal.fire("Lỗi", response.message, "error");
+								}
+							},
+							error: function () {
+								Swal.fire("Lỗi", "Không thể thêm sản phẩm!", "error");
+							}
+						});
+					});
+				});
+
+			</script>
 		}

@@ -8,6 +8,7 @@
 	<title>Home | E-Shopper</title>
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.min.css" rel="stylesheet">
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
 	<link href="~/css/animate.css" rel="stylesheet">
@@ -95,8 +96,8 @@
 									<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
 									<li><a href="#"><i class="fa fa-user"></i> Account</a></li>
 									<li><a href="#"><i class="fa fa-star"></i> Wishlist</a></li>
+									<li><a href="http://localhost:5036/Admin">Admin CMS</a></li>
 									<li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-lock"></i>Chào, @User.Identity.Name, Đăng xuất</a></li>
-
 								}
 								else
 								{
@@ -147,9 +148,13 @@
 						</div>
 					</div>
 					<div class="col-sm-3">
-						<div class="search_box pull-right">
-							<input type="text" placeholder="Search" />
-						</div>
+						<form asp-controller="Product" asp-action="Search" method="get">
+							<div class="search_box pull-right">
+								<input type="text" name="searchTerm" placeholder="Search" />
+								<button class="btn btn-warning" type="submit">Tìm kiếm</button>
+							</div>
+						</form>
+
 					</div>
 				</div>
 			</div>
@@ -375,6 +380,17 @@
 	<script src="~/js/price-range.js"></script>
 	<script src="~/js/jquery.prettyPhoto.js"></script>
 	<script src="~/js/main.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.all.min.js"></script>
+	<script>
+		$(function ()
+		{
+			var message = '@TempData["success"]';
+			if(message != '')
+			{
+				Swal.fire(message);
+			}
+		});
+	</script>
 	@await RenderSectionAsync("Scripts", required: false)
 
 </body>

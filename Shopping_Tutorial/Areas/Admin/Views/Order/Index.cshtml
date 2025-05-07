@@ -3,7 +3,7 @@
     ViewData["title"] = "Danh sách đơn hàng";
 }
 <h3>Danh sách đơn hàng</h3>
-<table class="table">
+<table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">#</th>
@@ -12,6 +12,8 @@
             <th scope="col">UserName</th>
             <th scope="col">Ngày đặt</th>
             <th scope="col">Trạng thái</th>
+            <th scope="col">Hành động</th>
+
         </tr>
     </thead>
     <tbody>
@@ -29,7 +31,7 @@
                     }
                     else
                     {
-                        <span class="text-area text-danger">Đơn hàng thành công</span>
+                        <span class="text-area text-danger">Đã xử lí</span>
 
                     }
                 </td>

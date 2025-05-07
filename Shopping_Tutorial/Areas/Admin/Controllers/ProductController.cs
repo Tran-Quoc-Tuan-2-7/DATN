@@ -19,10 +19,28 @@ public class ProductController : Controller
         _webHostEnvironment = webHostEnvironment;
     }
 
-    public async Task<IActionResult> Index()
+
+    public async Task<IActionResult> Index(int pg = 1)
     {
-        return View(await _dataContext.Products.OrderByDescending(p => p.Id).Include(p => p.Category).Include(p => p.Brand).ToArrayAsync());
+        var product = await _dataContext.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .ToListAsync();
+
+        const int pageSize = 10;
+
+        if (pg < 1)
+            pg = 1;
+
+        int recsCount = product.Count();
+        var pager = new Paginate(recsCount, pg, pageSize);
+        int recSkip = (pg - 1) * pageSize;
+        var data = product.Skip(recSkip).Take(pager.PageSize).ToList();
+
+        ViewBag.Pager = pager;
+        return View(data);
     }
+
 
     public async Task<IActionResult> Create()
     {

@@ -7,6 +7,9 @@
 	<meta name="author" content="">
 	<title>@ViewData["title"] - Admin Areas</title>
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.min.css" rel="stylesheet">
+	<link href="	//cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css" rel="stylesheet">
 	<link href="~/css/font-awesome.min.css" rel="stylesheet">
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
@@ -83,8 +86,16 @@
 						</div>
 					</div>
 					<div class="col-sm-3">
-						<div class="search_box pull-right">
-							<input type="text" placeholder="Search" />
+						<form asp-controller="Product" asp-action="Search" method="post">
+							<div>
+								<div class="search_box pull-right">
+									<input type="text" placeholder="Search" />
+									<button class="btn btn-warning" type="submit">Tìm kiếm</button>
+							</div>
+							</div>
+
+						</form>
+						
 						</div>
 					</div>
 				</div>
@@ -115,8 +126,26 @@
 	<script src="~/js/price-range.js"></script>
 	<script src="~/js/jquery.prettyPhoto.js"></script>
 	<script src="~/js/main.js"></script>
+	<script src="	//cdn.datatables.net/2.3.0/js/dataTables.min.js"></script>
 	<script src="~/backend/js/site.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.all.min.js"></script>
+	<script>
+		$(function ()
+		{
+			var message = '@TempData["success"]';
+			if(message != '')
+			{
+				Swal.fire(message);
+			}
+		});
+	</script>
+
+		<script>
+			let table = new DataTable('#myTable');
+		</script>
 
 	@await RenderSectionAsync("Scripts", required:false) 
 </body>
 </html>
+
+

@@ -1,40 +1,92 @@
 ﻿@model IEnumerable<OrderDetails>
-@{
-    ViewData["title"] = "Chi tiết đơn hàng";
-}
-<h3>Chi tiết đơn hàng</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
 
-            <th scope="col">Code</th>
-            <th scope="col">UserName</th>
-            <th scope="col">Ngày đặt</th>
-            <th scope="col">Trạng thái</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    decimal total = 0;
+    int stt = 1;
+    string orderCode = Model.FirstOrDefault()?.OrderCode ?? "";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Chi tiết đơn hàng</h3>
+
+    <table class="table table-bordered">
+        <thead class="table-light">
             <tr>
                 <th>#</th>
-                <th scope="row">@item.OrderCode</th>
-                @* <td>@item.UserName</td> *@
-                @* <td>@Html.Raw(item.CreatedDate)</td> *@
-                @* <td> *@
-                @*     @if (item.Status == 1) *@
-                @*     { *@
-                @*         <span class="text-area text-success">Đơn hàng mới</span> *@
-                @*     } *@
-                @*     else *@
-                @*     { *@
-                @*         <span class="text-area text-danger">Đơn hàng thành công</span> *@
-
-                @*     } *@
-                @* </td> *@
-
+                <th>Mã đơn hàng</th>
+                <th>Người đặt</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var subtotal = item.Price * item.Quantity;
+                total += subtotal;
+
+                <tr>
+                    <input type="hidden" class="getId" value="@item.OrderCode" />
+                    <td>@stt</td>
+                    <td>@item.OrderCode</td>
+                    <td>@item.UserName</td>
+                    <td>@item.Product?.Name</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@subtotal.ToString("C")</td>
+                </tr>
+
+                stt++;
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-end"><strong>Tổng cộng:</strong></td>
+                <td><strong>@total.ToString("C")</strong></td>
+                <td>
+                    <select class="form-select form-select-sm select-update-order" style="width: 150px;">
+                        <option value="1" selected>Đơn hàng mới</option>
+                        <option value="0">Đã xử lý</option>
+                    </select>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.select-update-order').change(function () {
+                var status = $(this).val();
+                var ordercode = $('.getId').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UpdateOrder")',
+                    data: { status: status, ordercode: ordercode },
+                    success: function (result) {
+                        if (result.success) {
+                            Swal.fire({
+                                title: "Cập nhật đơn hàng thành công",
+                                icon: "success"
+                            }).then(() => {
+                                // Điều hướng về trang Index sau khi cập nhật
+                                window.location.href = '@Url.Action("Index", "Order")';
+                            });
+                        } else {
+                            Swal.fire("Cập nhật đơn hàng thất bại: " + result.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("AJAX error: " + error);
+                        Swal.fire("Có lỗi xảy ra khi gửi yêu cầu.");
+                    }
+                });
+            });
+        });
+    </script>
+}

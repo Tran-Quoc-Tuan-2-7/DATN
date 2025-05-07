@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping_Tutorial.Models;
@@ -35,5 +36,26 @@ public class OrderController : Controller
         await _dataContext.SaveChangesAsync();
         TempData["success"] = "Thương hiệu đã xóa thành công";
         return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateOrder(string ordercode, int status)
+    {
+        var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == ordercode);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        order.Status = status;
+        try
+        {
+            await _dataContext.SaveChangesAsync();
+            return Ok(new { success = true, message = "Cập nhật trạng thái đơn hàng thành công" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Xảy ra lỗi khi cập nhật trạng thái đơn hàng");
+        }
     }
 }
