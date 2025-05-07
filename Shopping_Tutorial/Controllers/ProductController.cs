@@ -32,6 +32,14 @@ namespace Shopping_Tutorial.Controllers
 
             var productsById = _dataContext.Products.Where(p => p.Id == Id).FirstOrDefault();
 
+            //san pham lien quan
+            var relatedProducts = await _dataContext.Products
+                .Where(p => p.CategoryId == productsById.CategoryId && p.Id != productsById.Id)
+                .Take(4).
+                ToListAsync();
+
+            ViewBag.RelatedProducts = relatedProducts;
+
             return View(productsById);
         }
 

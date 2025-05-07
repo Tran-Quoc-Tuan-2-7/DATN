@@ -1,0 +1,43 @@
+﻿/* Sử dụng flexbox để căn chỉnh các phần tử */
+.features_items .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Khoảng cách giữa các sản phẩm */
+}
+
+/* Đảm bảo các sản phẩm có chiều cao bằng nhau */
+.product-image-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+    /* Đảm bảo hình ảnh có chiều cao cố định và căn giữa */
+    .product-image-wrapper img {
+        max-height: 200px; /* Điều chỉnh chiều cao hình ảnh */
+        object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+/* Cố định chiều cao của các phần tử trong mỗi sản phẩm */
+.productinfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+    /* Đảm bảo các phần tử văn bản không có margin quá lớn */
+    .productinfo h2, .productinfo p {
+        margin: 5px 0;
+    }
+
+/* Nút thêm vào giỏ hàng */
+.add-to-cart {
+    margin-top: auto; /* Đảm bảo nút thêm vào giỏ hàng nằm dưới cùng */
+}

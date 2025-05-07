@@ -97,7 +97,6 @@ public class ProductController : Controller
             TempData["error"] = "Có một vài lỗi trong form, vui lòng kiểm tra lại.";
             return View(product);
         }
-        return View(product);
     }
 
     public async Task<IActionResult> Edit(int Id)
@@ -183,7 +182,6 @@ public class ProductController : Controller
             TempData["error"] = "Có một vài lỗi trong form, vui lòng kiểm tra lại.";
             return View(product);
         }
-        return View(product);
     }
 
     public async Task<IActionResult> Delete(int Id)

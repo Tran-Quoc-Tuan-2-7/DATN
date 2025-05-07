@@ -1,0 +1,62 @@
+﻿@model ContactModel
+@{
+	ViewData["title"] = "Cập nhật liên hệ";
+}
+<h4>Cập nhật liên hệ</h4>
+<div class="col-md-9">
+	<form asp-action="Edit" asp-controller="Contact" enctype="multipart/form-data">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<div class="form-group">
+			<label>Tên shop</label>
+			<input asp-for="Name" class="form-control" />
+			<span asp-validation-for="Name" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<label>Map</label>
+			<input asp-for="Map" class="form-control" />
+			<span asp-validation-for="Map" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<label>Mô tả</label>
+			<input asp-for="Description" class="form-control" />
+			<span asp-validation-for="Description" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<label>Số điện thoại</label>
+			<input asp-for="Phone" class="form-control" />
+			<span asp-validation-for="Phone" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<label>Email</label>
+			<input asp-for="Email" class="form-control" />
+			<span asp-validation-for="Email" class="text-danger" />
+		</div>
+
+		<div class="form-group">
+			<label>Hình ảnh</label>
+			<input asp-for="ImageUpload" class="form-control-file" />
+			<span asp-validation-for="ImageUpload" class="text-danger" />
+			<img src="~/media/logo/@Model.LogoImg" width="100" height="80" />
+
+		</div>
+
+		<div class="form-group">
+			<button class="btn btn-primary">Sửa</button>
+		</div>
+	</form>
+	<a asp-action="Index">Trở lại danh sách liên hệ</a>
+</div>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+	<script>
+		CKEDITOR.replace( 'Description' );
+	</script>
+}

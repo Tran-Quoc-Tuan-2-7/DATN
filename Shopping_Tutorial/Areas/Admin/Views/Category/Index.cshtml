@@ -3,8 +3,10 @@
     ViewData["title"] = "Danh sách danh mục";
 }
 <h3>Danh sách danh mục</h3>
-<a asp-action="Create" asp-controller="Category">Thêm danh mục</a>
-<table class="table">
+<a asp-action="Create" asp-controller="Category" class="btn btn-primary">
+    <i class="fa fa-plus"></i>Thêm danh mục
+</a>
+<table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">Id</th>
