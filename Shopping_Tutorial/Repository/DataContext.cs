@@ -19,6 +19,8 @@ namespace Shopping_Tutorial.Repository
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<ContactModel> Contacts { get; set; }
+        public DbSet<ProductQuantityModel> ProductQuantities { get; set; }
+
 
     }
 }

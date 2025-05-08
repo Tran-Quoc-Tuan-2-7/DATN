@@ -11,6 +11,8 @@
         <tr>
             <th scope="col">Id</th>
             <th scope="col">Tên sản phẩm</th>
+            <th scope="col">Số lượng</th>
+            <th scope="col">Số lượng đã bán</th>
             <th scope="col">Mô tả</th>
             <th scope="col">Giá</th>
             <th scope="col">Hình ảnh</th>
@@ -21,22 +23,24 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var item in Model)
+        @foreach (var item in Model)
         {
             <tr>
-            <th scope="row">@item.Id</th>
-            <td>@item.Name</td>
-            <td>@Html.Raw(item.Description)</td>
-            <td>@item.Price</td>
-            <td><img src="~/media/products/@item.Image" width="100" height="80" /></td>
-            <td>@item.Slug</td>
-            <td>@(item.Category != null ? item.Category.Name : "Không rõ")</td>
-            <td>@(item.Brand != null ? item.Brand.Name : "Không rõ")</td>
+                <th scope="row">@item.Id</th>
+                <td>@item.Name</td>
+                <td><b>@item.Quantity</b><br /><a asp-controller="Product" asp-action="AddQuantity" asp-route-id="@item.Id" >Thêm số lượng</a></td>
+                <td><b>@item.Sold</b></td>
+                <td>@Html.Raw(item.Description)</td>
+                <td>@String.Format("{0:N0} VNĐ", item.Price)</td> <!-- Format giá tiền -->
+                <td><img src="~/media/products/@item.Image" width="100" height="80" /></td>
+                <td>@item.Slug</td>
+                <td>@(item.Category != null ? item.Category.Name : "Không rõ")</td>
+                <td>@(item.Brand != null ? item.Brand.Name : "Không rõ")</td>
 
-            <td>
-                <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Product" asp-route-Id="@item.Id">Sửa</a>
+                <td>
+                    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Product" asp-route-Id="@item.Id">Sửa</a>
                     <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Product" asp-route-Id="@item.Id">Xóa</a>
-            </td>
+                </td>
             </tr>
         }
 

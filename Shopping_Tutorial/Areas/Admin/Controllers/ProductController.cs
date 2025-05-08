@@ -211,6 +211,35 @@ public class ProductController : Controller
         return RedirectToAction("Index");
     }
 
+    //Thêm số lượng sản phẩm
+    [HttpGet]
+    public async Task<IActionResult> AddQuantity(int Id)
+    {
+        var productByQuantity = await _dataContext.ProductQuantities.Where(pq => pq.ProductId == Id).ToListAsync();
+        ViewBag.ProductQuantity = productByQuantity;
+        ViewBag.Id = Id;
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> StoreProductQuantity(ProductQuantityModel productQuantityModel)
+    {
+        var product = _dataContext.Products.Find(productQuantityModel.ProductId);
+        if (product == null)
+        {
+            return NotFound();
+        }
+        product.Quantity += productQuantityModel.Quantity;
+
+        productQuantityModel.Quantity = productQuantityModel.Quantity;
+        productQuantityModel.ProductId = productQuantityModel.ProductId;
+        productQuantityModel.DateCreated = DateTime.Now;
+
+        _dataContext.Add(productQuantityModel);
+        _dataContext.SaveChangesAsync();
+        TempData["success"] = "Thêm số lượng thành công";
+        return RedirectToAction("AddQuantity", "Product", new { Id = productQuantityModel.ProductId });
+    }
 }
 
 

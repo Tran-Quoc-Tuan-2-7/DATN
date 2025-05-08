@@ -14,7 +14,8 @@
 
 		<div class="form-group">
 			<label>Giá</label>
-			<input asp-for="Price" class="form-control" />
+			<input asp-for="Price" pattern="[0-9.,]+" class="form-control typing-price" />
+			<span id="price-convert"></span>
 			<span asp-validation-for="Price" class="text-danger" />
 		</div>
 
@@ -78,4 +79,17 @@
 	<script>
 		CKEDITOR.replace( 'Description' );
 	</script>
+
+	<script>
+		$(".typing-price").on("keyup", function () {
+			var rawValue = $(this).val();
+
+			var numericValue = rawValue.replace(/[^\d]/g, '');
+
+			var formattedValue = new Intl.NumberFormat('vi-VN').format(numericValue);
+
+			$("#price-convert").text(formattedValue + ' ₫');
+		});
+	</script>
+
 }
