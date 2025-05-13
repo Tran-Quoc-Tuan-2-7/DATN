@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Shopping_Tutorial.Models;
 using Shopping_Tutorial.Models.ViewModels;
 using Shopping_Tutorial.Repository;
 
 namespace Shopping_Tutorial.Controllers
 {
-    public class CartController : Controller    
+    public class CartController : Controller
     {
         private readonly DataContext _dataContext;
         public CartController(DataContext dataContext)
@@ -15,10 +19,21 @@ namespace Shopping_Tutorial.Controllers
         public IActionResult Index()
         {
             List<CartItemModel> cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+
+            //nhan shipping gia tu cookie
+            var shippingPriceCookie = Request.Cookies["ShippingPrice"];
+            decimal shippingPrice = 0;
+            if (shippingPriceCookie != null)
+            {
+                var shippingPriceJson = shippingPriceCookie;
+                shippingPrice = JsonConvert.DeserializeObject<decimal>(shippingPriceJson);
+            }
+
             CartItemViewModel cartVM = new()
             {
                 CartItems = cartItems,
                 GrandTotal = cartItems.Sum(x => x.Quantity * x.Price),
+                ShippingCost = shippingPrice,
             };
             return View(cartVM);
         }
@@ -48,70 +63,57 @@ namespace Shopping_Tutorial.Controllers
 
             HttpContext.Session.SetJson("Cart", cart);
 
-            TempData["success"] = "Add Item to cart Successfully";
+            TempData["success"] = "Thêm sản phẩm thành công";
 
             return Redirect(Request.Headers["Referer"].ToString());
         }
 
         //Ham giam so luong
-        public async Task<IActionResult> Decrease(int Id)
+        [HttpPost]
+        public async Task<IActionResult> Increase(int id)
         {
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
-            CartItemModel cartItem = cart.Where(c => c.ProductId == Id).FirstOrDefault();
+            var product = await _dataContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
+            var cartItem = cart.FirstOrDefault(c => c.ProductId == id);
+
+            if (cartItem.Quantity > 0 && product.Quantity > cartItem.Quantity)
+            {
+                cartItem.Quantity++;
+            }
+
+            HttpContext.Session.SetJson("Cart", cart);
+
+            return Json(new
+            {
+                success = true,
+                quantity = cartItem.Quantity,
+                total = cartItem.Quantity * cartItem.Price,
+                grandTotal = cart.Sum(x => x.Price * x.Quantity)
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Decrease(int id)
+        {
+            var cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
+            var cartItem = cart.FirstOrDefault(c => c.ProductId == id);
+
             if (cartItem.Quantity > 1)
             {
-                --cartItem.Quantity;
+                cartItem.Quantity--;
             }
-            else
+
+            HttpContext.Session.SetJson("Cart", cart);
+
+            return Json(new
             {
-                cart.RemoveAll(p =>  p.ProductId == Id);
-            }
-
-            if (cart.Count == 0)
-            {
-                HttpContext.Session.Remove("Cart");
-            }
-
-            else
-            {
-                HttpContext.Session.SetJson("Cart", cart);
-
-            }
-
-            TempData["success"] = "Decrease Item quantity to cart Successfully";
-
-            return RedirectToAction("Index");
+                success = true,
+                quantity = cartItem.Quantity,
+                total = cartItem.Quantity * cartItem.Price,
+                grandTotal = cart.Sum(x => x.Price * x.Quantity)
+            });
         }
 
-        //Ham tang so luong
-        public async Task<IActionResult> Increase(int Id)
-        {
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
-            CartItemModel cartItem = cart.Where(c => c.ProductId == Id).FirstOrDefault();
-            if (cartItem.Quantity > 0)
-            {
-                ++cartItem.Quantity;
-            }
-            else
-            {
-                cart.RemoveAll(p => p.ProductId == Id);
-            }
-
-            if (cart.Count == 0)
-            {
-                HttpContext.Session.Remove("Cart");
-            }
-
-            else
-            {
-                HttpContext.Session.SetJson("Cart", cart);
-
-            }
-
-            TempData["success"] = "Increase Item quantity to cart Successfully";
-
-            return RedirectToAction("Index");
-        }
 
         //Ham Remove
         public async Task<IActionResult> Remove(int Id)
@@ -130,7 +132,7 @@ namespace Shopping_Tutorial.Controllers
 
             }
 
-            TempData["success"] = "Remove Item to cart Successfully";
+            TempData["success"] = "Xóa sản phẩm thành công";
 
             return RedirectToAction("Index");
         }
@@ -139,7 +141,7 @@ namespace Shopping_Tutorial.Controllers
         {
             HttpContext.Session.Remove("Cart");
 
-            TempData["success"] = "Clear all Item to cart Successfully";
+            TempData["success"] = "Xóa tất cả sản phẩm thành công";
 
             return RedirectToAction("Index");
         }
@@ -166,7 +168,45 @@ namespace Shopping_Tutorial.Controllers
             return Json(new { success = true, message = "Đã thêm sản phẩm vào giỏ hàng!" });
         }
 
+        //tinh phi ship
+        [HttpPost]
+        public async Task<IActionResult> GetShipping(ShippingModel shippingModel, string quan, string tinh, string phuong)
+        {
+            var existingShipping = await _dataContext.Shippings
+                .FirstOrDefaultAsync(x => x.City == tinh && x.District == quan && x.Ward == phuong);
+            decimal shippingPrice = 0;
+            if (existingShipping != null)
+            {
+                shippingPrice = existingShipping.Price;
+            }
+            else
+            {
+                shippingPrice = 50000;
+            }
+            var shippingPriceJson = JsonConvert.SerializeObject(shippingPrice);
+            try
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTimeOffset.Now.AddMinutes(30),                    
+                    Secure = Request.IsHttps
+                };
+                Response.Cookies.Append("ShippingPrice", shippingPriceJson, cookieOptions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding shipping price cookie: {ex.Message}");
+            }
+
+            return Json(new { shippingPrice });
+        }
+
+        [HttpPost]
+        public IActionResult RemoveShippingCookie()
+        {
+            Response.Cookies.Delete("ShippingPrice");
+            return Json(new { success = true });
+        }
     }
-
-
 }

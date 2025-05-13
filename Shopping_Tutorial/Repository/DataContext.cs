@@ -20,6 +20,7 @@ namespace Shopping_Tutorial.Repository
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<ContactModel> Contacts { get; set; }
         public DbSet<ProductQuantityModel> ProductQuantities { get; set; }
+        public DbSet<ShippingModel> Shippings { get; set; }
 
 
     }

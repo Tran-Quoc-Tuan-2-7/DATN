@@ -26,6 +26,10 @@ public class OrderController : Controller
     {
         var detailsOrder = await _dataContext.OrderDetails.Include(od => od.Product).Where(od => od.OrderCode == ordercode).ToListAsync();
 
+        //lay phi van chuyen
+        var ShippingCost = _dataContext.Orders.Where(o => o.OrderCode == ordercode).First();
+        ViewBag.ShippingCost = ShippingCost.ShippingCost;
+
         return View(detailsOrder);
     }
 

@@ -9,6 +9,8 @@
 </style>
 
 <div class="col-sm-9 padding-right">
+	<partial name="_FilterProductsPartial" />
+
 	<div class="features_items">
 		<!--features_items-->
 		<h2 class="title text-center">@ViewBag.Slug</h2>
@@ -50,3 +52,54 @@
 				</div>
 			</div>
 		}
+@section Scripts {
+			<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+			<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+			<script>
+							$(document).ready(function () {
+					// Slider giá
+					$("#slider-range").slider({
+						range: true,
+						step: 100000,
+						min: 10000000,
+						max: 100000000,
+						values: [10000000, 50000000],
+						slide: function (event, ui) {
+							$("#amount").val(
+								new Intl.NumberFormat('vn-VN', {style: 'currency', currency: 'VND'})
+								.format(ui.values[0])
+								+ " - " + new Intl.NumberFormat('vn-VN', {style: 'currency', currency: 'VND'})
+								.format(ui.values[1]))
+						}
+					});
+
+					$("#amount").val(
+						new Intl.NumberFormat('vn-VN', {style: 'currency', currency: 'VND'})
+								.format($("#slider-range").slider("values", 0)) 
+								+
+						" - " + new Intl.NumberFormat('vn-VN', {style: 'currency', currency: 'VND'})
+								.format($("#slider-range").slider("values", 1))) ;
+
+					// Button lọc giá
+					$('.btn-locgia').on('click', function () {
+						var url = $(this).data("current_url");
+
+						if (url) {
+							window.location = url + "?startprice=" + $("#slider-range").slider("values", 0)
+								+ "&endprice=" + $("#slider-range").slider("values", 1);
+						}
+
+						return false;
+					});
+
+					// Dropdown sắp xếp
+					$('#sort_by').on('change', function () {
+						var url = $(this).val();
+						if (url) {
+							window.location = url;
+						}
+						return false;
+					});
+				});
+			</script>
+}

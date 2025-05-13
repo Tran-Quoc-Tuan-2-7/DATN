@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Shopping_Tutorial.Models;
 using Shopping_Tutorial.Repository;
 
@@ -26,25 +28,41 @@ public class CheckoutController : Controller
             var ordercode = Guid.NewGuid().ToString();
             var orderItem = new OrderModel();
             orderItem.OrderCode = ordercode;
+
+            var shippingPriceCookie = Request.Cookies["ShippingPrice"];
+            decimal shippingPrice = 0;
+            if (shippingPriceCookie != null)
+            {
+                var shippingPriceJson = shippingPriceCookie;
+                shippingPrice = JsonConvert.DeserializeObject<decimal>(shippingPriceJson);
+            }
+
+            orderItem.ShippingCost = shippingPrice;
             orderItem.UserName = userEmail;
             orderItem.Status = 1;
             orderItem.CreatedDate = DateTime.Now;
 
             _dataContext.Add(orderItem);
             _dataContext.SaveChanges();
-            List<CartItemModel> cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+            List<CartItemModel> cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
+
             foreach (var cart in cartItems)
             {
-                var orderdetails = new OrderDetails
-                {
-                    UserName = userEmail,
-                    OrderCode = ordercode,
-                    ProductId = cart.ProductId,
-                    Price = cart.Price,
-                    Quantity = cart.Quantity
-                };
+                var orderdetail = new OrderDetails();
+                orderdetail.UserName = userEmail;
+                orderdetail.OrderCode = ordercode;
+                orderdetail.ProductId = cart.ProductId;
+                orderdetail.Price = cart.Price;
+                orderdetail.Quantity = cart.Quantity;
 
-                _dataContext.Add(orderdetails);
+                //update product quantity
+                var product = await _dataContext.Products.Where(p => p.Id == cart.ProductId).FirstAsync();
+                product.Quantity -= cart.Quantity;
+                product.Sold += cart.Quantity;
+
+                _dataContext.Update(product);
+                _dataContext.Add(orderdetail);
+                _dataContext.SaveChanges();
             }
 
             await _dataContext.SaveChangesAsync();
@@ -55,7 +73,6 @@ public class CheckoutController : Controller
             return RedirectToAction("Index", "Cart");
 
         }
-        return View();
     }
 }
 
