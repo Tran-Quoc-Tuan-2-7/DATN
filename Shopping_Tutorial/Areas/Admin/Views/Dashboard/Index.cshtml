@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "Thống kê";
+}
+
+<h3>Thống kê</h3>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <p class="card-title">Sản phẩm</p>
+                <h4>@ViewBag.CountProduct</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <p class="card-title">Đơn hàng</p>
+                <h4>@ViewBag.CountOrder</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <p class="card-title">Danh mục</p>
+                <h4>@ViewBag.CountCategory</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <p class="card-title">Người dùng</p>
+                <h4>@ViewBag.CountUser</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <select class="filter-select">
+                <option value="30">---Lọc dữ liệu---</option>
+                <option value="7">7 ngày trước</option>
+                <option value="30">1 tháng qua</option>
+                <option value="90">3 tháng quá</option>
+                <option value="365">1 năm</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h5>Biểu đồ thống kê doanh số</h5>
+        <div id="myfirstchart" style="height: 300px;"></div>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            $(document).ready(function () {
+                var ChartMorris = new Morris.Line({
+                    element: 'myfirstchart',
+                    data: [],
+                    xkey: 'date',
+                    ykeys: ['sold', 'quantity', 'revenue', 'profit'],
+                    labels: ['Đơn hàng', 'Số lượng', 'Doanh thu', 'Lợi nhuận'],
+                    parseTime: false, // Không phân tích theo Date object
+                    xLabelAngle: 45
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetChartData", "Dashboard")',
+                    dataType: "json",
+                    success: function (data) {
+                        if (data && data.length > 0) {
+                            var formattedData = data.map(function (item) {
+                                return {
+                                    date: item.date, // Chuỗi yyyy-MM-dd đã format ở Controller
+                                    sold: item.sold,
+                                    quantity: item.quantity,
+                                    revenue: item.revenue,
+                                    profit: item.profit
+                                };
+                            });
+
+                            ChartMorris.setData(formattedData);
+                        } else {
+                            console.warn("Không có dữ liệu để hiển thị.");
+                            ChartMorris.setData([]);
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Lỗi khi lấy dữ liệu biểu đồ:", error);
+                    }
+                });
+
+                $('.filter-select').on('change', function () {
+                    var days = $(this).val();
+                    var endDate = new Date();
+                    var startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GetChartDataBySelect", "Dashboard")',
+                        dataType: "json",
+                        data: {
+                            startDate: startDate.toISOString().split('T')[0],
+                            endDate: endDate.toISOString().split('T')[0]
+                        },
+                        success: function (data) {
+                            if (data && data.length > 0) {
+                                ChartMorris.setData(data.map(function (item) {
+                                    return {
+                                        date: item.date,
+                                        sold: item.sold,
+                                        quantity: item.quantity,
+                                        revenue: item.revenue,
+                                        profit: item.profit
+                                    };
+                                }));
+                            } else {
+                                console.warn("Không có dữ liệu để hiển thị.");
+                                ChartMorris.setData([]);
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Lỗi khi lấy dữ liệu biểu đồ:", error);
+                        }
+                    });
+                });
+
+            });
+        </script>
+}
+

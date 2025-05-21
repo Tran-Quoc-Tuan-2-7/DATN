@@ -9,7 +9,8 @@
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.min.css" rel="stylesheet">
-	<link href="	//cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css" rel="stylesheet">
+	<link href="//cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
 	<link href="~/css/font-awesome.min.css" rel="stylesheet">
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
@@ -35,7 +36,6 @@
 			<!--header_top-->
 			<div class="container">
 				<div class="row">
-					
 				</div>
 			</div>
 		</div><!--/header_top-->
@@ -49,12 +49,9 @@
 							<a href="index.html"><img src="images/home/logo.png" alt="" /></a>
 						</div>
 						<div class="btn-group pull-right">
-								
-
-							
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
 		</div><!--/header-middle-->
@@ -74,7 +71,8 @@
 						</div>
 						<div class="mainmenu pull-left">
 							<ul class="nav navbar-nav collapse navbar-collapse">
-								<li><a asp-action="Index" asp-controller="Product" asp-area="Admin" class="active">Home</a></li>
+								<li><a asp-action="Index" asp-controller="Home" asp-area="" class="active">Home</a></li>
+								<li><a asp-action="Index" asp-controller="Dashboard">Thống kê</a></li>
 								<li><a asp-action="Index" asp-controller="Product" asp-area="Admin">Sản phẩm</a></li>
 								<li><a asp-action="Index" asp-controller="Shipping" asp-area="Admin">Vận chuyển</a></li>
 								<li><a asp-action="Index" asp-controller="Category" asp-area="Admin">Danh mục</a></li>
@@ -83,6 +81,8 @@
 								<li><a asp-action="Index" asp-controller="User" asp-area="Admin">Người dùng</a></li>
 								<li><a asp-action="Index" asp-controller="Role" asp-area="Admin">Quyền</a></li>
 								<li><a asp-action="Index" asp-controller="Contact" asp-area="Admin">Liên hệ</a></li>
+								<li><a asp-action="Index" asp-controller="Coupon" asp-area="Admin">Mã giảm giá</a></li>
+
 							</ul>
 
 						</div>
@@ -93,15 +93,15 @@
 								<div class="search_box pull-right">
 									<input type="text" placeholder="Search" />
 									<button class="btn btn-warning" type="submit">Tìm kiếm</button>
-							</div>
+								</div>
 							</div>
 
 						</form>
-						
-						</div>
+
 					</div>
 				</div>
 			</div>
+		</div>
 		</div><!--/header-bottom-->
 	</header><!--/header-->
 
@@ -110,14 +110,12 @@
 		<div class="container">
 			<div class="row">
 				@Html.Partial("_NotificationPartial")
-				@RenderBody() 
-		</div>
+				@RenderBody()
+			</div>
 		</div>
 	</section>
 
 	<footer id="footer">
-		
-
 	</footer><!--/Footer-->
 
 
@@ -140,6 +138,8 @@
 	<script src="https://cdn.datatables.net/buttons/3.2.3/js/buttons.print.min.js"></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.21.0/dist/sweetalert2.all.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 	<script>
 		$(function ()
 		{
@@ -161,7 +161,7 @@
 		});
 	</script>
 
-	@await RenderSectionAsync("Scripts", required:false) 
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
 

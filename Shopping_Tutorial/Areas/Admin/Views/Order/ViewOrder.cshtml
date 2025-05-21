@@ -34,9 +34,9 @@
                     <td>@item.OrderCode</td>
                     <td>@item.UserName</td>
                     <td>@item.Product?.Name</td>
-                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.Price.ToString("#,##0 VND")</td>
                     <td>@item.Quantity</td>
-                    <td>@subtotal.ToString("C")</td>
+                    <td>@subtotal.ToString("#,##0 VND")</td>
                 </tr>
 
                 stt++;
@@ -45,13 +45,16 @@
         <tfoot>
             <tr>
                 <td colspan="6" class="text-end"><strong>Tổng cộng:</strong></td>
-                <td><strong>@total.ToString("C")</strong></td>
+                <td><strong>@total.ToString("#,##0 VND")</strong></td>
                 <td>Phí vận chuyển: @ViewBag.ShippingCost.ToString("#,##0")</td>
                 <td>
-                    <select class="form-select form-select-sm select-update-order" style="width: 150px;">
-                        <option value="1" selected>Đơn hàng mới</option>
-                        <option value="0">Đã xử lý</option>
-                    </select>
+                    @if (@ViewBag.Status != 3)
+                    {
+                        <select class="form-select form-select-sm select-update-order" style="width: 150px;">
+                            <option value="1" selected>Đơn hàng mới</option>
+                            <option value="2">Đã xử lý</option>
+                        </select>
+                    }
                 </td>
             </tr>
         </tfoot>

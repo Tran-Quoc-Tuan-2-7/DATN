@@ -27,9 +27,9 @@ public class OrderController : Controller
         var detailsOrder = await _dataContext.OrderDetails.Include(od => od.Product).Where(od => od.OrderCode == ordercode).ToListAsync();
 
         //lay phi van chuyen
-        var ShippingCost = _dataContext.Orders.Where(o => o.OrderCode == ordercode).First();
-        ViewBag.ShippingCost = ShippingCost.ShippingCost;
-
+        var Order = _dataContext.Orders.Where(o => o.OrderCode == ordercode).First();
+        ViewBag.ShippingCost = Order.ShippingCost;
+        ViewBag.Status = Order.Status;
         return View(detailsOrder);
     }
 
@@ -38,7 +38,7 @@ public class OrderController : Controller
         OrderModel order = await _dataContext.Orders.FindAsync(Id);
         _dataContext.Orders.Remove(order);
         await _dataContext.SaveChangesAsync();
-        TempData["success"] = "Thương hiệu đã xóa thành công";
+        TempData["success"] = "Đơn hàng đã xóa thành công";
         return RedirectToAction("Index");
     }
 
@@ -47,11 +47,59 @@ public class OrderController : Controller
     {
         var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == ordercode);
         if (order == null)
-        {
             return NotFound();
+
+        if (status == 2 && order.Status != 2)
+        {
+            var orderDetails = await _dataContext.OrderDetails
+                .Where(od => od.OrderCode == ordercode)
+                .Include(od => od.Product)
+                .ToListAsync();
+
+            foreach (var item in orderDetails)
+            {
+                var product = item.Product;
+                if (product.Quantity < item.Quantity)
+                    return BadRequest(new { success = false, message = $"Không đủ số lượng sản phẩm {product.Name}" });
+
+                product.Quantity -= item.Quantity;
+                product.Sold += item.Quantity;
+                _dataContext.Update(product);
+            }
+
+            // cập nhật thống kê
+            var statistical = await _dataContext.Statisticals
+                .FirstOrDefaultAsync(s => s.DateCreated.Date == order.CreatedDate.Date);
+
+            int totalQuantity = orderDetails.Count;
+            int totalSold = orderDetails.Sum(od => od.Quantity);
+            decimal totalRevenue = orderDetails.Sum(od => od.Quantity * od.Product.Price);
+            decimal totalProfit = orderDetails.Sum(od => (od.Product.Price / 5) * od.Quantity);
+
+            if (statistical != null)
+            {
+                statistical.Quantity += totalQuantity;
+                statistical.Sold += totalSold;
+                statistical.Revenue += totalRevenue;
+                statistical.Profit += totalProfit;
+                _dataContext.Update(statistical);
+            }
+            else
+            {
+                statistical = new StatisticalModel()
+                {
+                    DateCreated = order.CreatedDate,
+                    Quantity = totalQuantity,
+                    Sold = totalSold,
+                    Revenue = totalRevenue,
+                    Profit = totalProfit
+                };
+                _dataContext.Add(statistical);
+            }
+
+            order.Status = status;
         }
 
-        order.Status = status;
         try
         {
             await _dataContext.SaveChangesAsync();
@@ -59,7 +107,8 @@ public class OrderController : Controller
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Xảy ra lỗi khi cập nhật trạng thái đơn hàng");
+            return StatusCode(500, $"Lỗi: {ex.Message}");
         }
+
     }
 }

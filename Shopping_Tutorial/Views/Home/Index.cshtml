@@ -9,22 +9,23 @@
         <div class="features_items">
             <h2 class="title text-center">Features Items</h2>
             <div class="row">
-                @foreach (var item in Model)
+                @foreach (var itemWithIndex in Model.Select((product, index) => new { product, index }))
                 {
                     <div class="col-sm-4">
                         <div class="product-image-wrapper">
                             <div class="single-products">
                                 <div class="productinfo text-center">
-                                    <a asp-action="Details" asp-controller="Product" asp-route-id="@item.Id">
-                                        <img src="~/media/products/@item.Image" alt="@item.Name" />
-                                        <h2>@item.Price.ToString("#,##0 VNĐ")</h2>
-                                        <p>@item.Name</p>
-                                        <p>Danh mục: @item.Category.Name</p>
-                                        <p>Thương hiệu: @item.Brand.Name</p>
+                                    <a asp-action="Details" asp-controller="Product" asp-route-id="@itemWithIndex.product.Id">
+                                        <img src="~/media/products/@itemWithIndex.product.Image" alt="@itemWithIndex.product.Name" />
+                                        <h2>@itemWithIndex.product.Price.ToString("#,##0 VNĐ")</h2>
+                                        <p>@itemWithIndex.product.Name</p>
+                                        <p>Danh mục: @itemWithIndex.product.Category.Name</p>
+                                        <p>Thương hiệu: @itemWithIndex.product.Brand.Name</p>
                                     </a>
-                                    @if(item.Quantity > 0)
+
+                                    @if (itemWithIndex.product.Quantity > 0)
                                     {
-                                        <button type="button" class="btn btn-default cart add-to-cart" data-product-id="@item.Id">
+                                        <button type="button" class="btn btn-default cart add-to-cart" data-product-id="@itemWithIndex.product.Id">
                                             <i class="fa fa-shopping-cart"></i> Thêm giỏ hàng
                                         </button>
                                     }
@@ -38,8 +39,15 @@
                             </div>
                         </div>
                     </div>
+
+                    @* Thêm clearfix sau mỗi 3 sản phẩm *@
+                    @if ((itemWithIndex.index + 1) % 3 == 0)
+                    {
+                        <div class="clearfix"></div>
+                    }
                 }
             </div>
+
         </div>
     </div>
 </div>

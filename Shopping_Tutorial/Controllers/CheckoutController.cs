@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Shopping_Tutorial.Models;
 using Shopping_Tutorial.Repository;
@@ -28,8 +27,10 @@ public class CheckoutController : Controller
             var ordercode = Guid.NewGuid().ToString();
             var orderItem = new OrderModel();
             orderItem.OrderCode = ordercode;
-
+            //nhan shipping price
             var shippingPriceCookie = Request.Cookies["ShippingPrice"];
+            //nhan coupon code
+            var coupon_code = Request.Cookies["CouponTitle"];
             decimal shippingPrice = 0;
             if (shippingPriceCookie != null)
             {
@@ -38,6 +39,7 @@ public class CheckoutController : Controller
             }
 
             orderItem.ShippingCost = shippingPrice;
+            orderItem.CouponCode = coupon_code;
             orderItem.UserName = userEmail;
             orderItem.Status = 1;
             orderItem.CreatedDate = DateTime.Now;
@@ -55,12 +57,12 @@ public class CheckoutController : Controller
                 orderdetail.Price = cart.Price;
                 orderdetail.Quantity = cart.Quantity;
 
-                //update product quantity
-                var product = await _dataContext.Products.Where(p => p.Id == cart.ProductId).FirstAsync();
-                product.Quantity -= cart.Quantity;
-                product.Sold += cart.Quantity;
+                ////update product quantity
+                ////var product = await _dataContext.Products.Where(p => p.Id == cart.ProductId).FirstAsync();
+                ////product.Quantity -= cart.Quantity;
+                ////product.Sold += cart.Quantity;
 
-                _dataContext.Update(product);
+                //_dataContext.Update(product);
                 _dataContext.Add(orderdetail);
                 _dataContext.SaveChanges();
             }
@@ -70,7 +72,7 @@ public class CheckoutController : Controller
             HttpContext.Session.Remove("Cart");
 
             TempData["success"] = "Đã tạo đơn hàng thành công";
-            return RedirectToAction("Index", "Cart");
+            return RedirectToAction("History", "Account");
 
         }
     }
