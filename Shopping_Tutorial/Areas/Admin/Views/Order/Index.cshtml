@@ -1,33 +1,63 @@
 ﻿@model IEnumerable<OrderModel>
+@inject IUrlHelper Url
+
 @{
     ViewData["title"] = "Danh sách đơn hàng";
 }
+
+@functions {
+    // Hàm helper trả về "selected" nếu storeId trùng currentStoreId, ngược lại trả về ""
+    public string GetSelectedAttribute(int storeId, int currentStoreId)
+    {
+        return storeId == currentStoreId ? "selected" : "";
+    }
+}
+
 <h3>Danh sách đơn hàng</h3>
+
 <table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">#</th>
-
             <th scope="col">Code</th>
+            <th scope="col">Cơ sở</th>  <!-- Thêm cột cơ sở -->
             <th scope="col">Phí vận chuyển</th>
             <th scope="col">Mã giảm giá</th>
             <th scope="col">UserName</th>
             <th scope="col">Ngày đặt</th>
             <th scope="col">Trạng thái</th>
             <th scope="col">Hành động</th>
-
         </tr>
     </thead>
     <tbody>
+        @{
+            int index = 1;
+            var stores = ViewBag.Stores as List<StoreModel>; // Danh sách các cơ sở để select
+        }
         @foreach (var item in Model)
         {
             <tr>
-                <th>#</th>
+                <th>@index</th>
                 <th scope="row">@item.OrderCode</th>
+                <td>
+                    <select class="form-control store-select" data-ordercode="@item.OrderCode">
+                        @foreach (var store in stores)
+                        {
+                            if (store.Id == item.StoreId)
+                            {
+                                <option value="@store.Id" selected>@store.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@store.Id">@store.Name</option>
+                            }
+                        }
+                    </select>
+                </td>
                 <th scope="row">@item.ShippingCost.ToString("#,##0 VNĐ")</th>
                 <th scope="row">@item.CouponCode</th>
                 <td>@item.UserName</td>
-                <td>@Html.Raw(item.CreatedDate)</td>
+                <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>
                     @if (item.Status == 1)
                     {
@@ -36,19 +66,44 @@
                     else if (item.Status == 2)
                     {
                         <span class="text-area text-primary">Đã xử lí</span>
-
                     }
                     else
                     {
                         <span class="text-area text-danger">Đã hủy</span>
                     }
                 </td>
-
                 <td>
                     <a asp-action="ViewOrder" class="btn btn-warning btn-sm" asp-controller="Order" asp-route-ordercode="@item.OrderCode">Xem đơn hàng</a>
                     <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Order" asp-route-Id="@item.Id">Xóa</a>
                 </td>
             </tr>
+            index++;
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.store-select').change(function () {
+                var orderCode = $(this).data('ordercode');
+                var storeId = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("UpdateOrder", "Order", new { area = "Admin" })',
+                    type: 'POST',
+                    data: {
+                        ordercode: orderCode,
+                        storeId: storeId
+                    },
+                    success: function (res) {
+                        alert(res.message || "Cập nhật cơ sở thành công");
+                    },
+                    error: function (xhr) {
+                        alert("Lỗi cập nhật: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+}

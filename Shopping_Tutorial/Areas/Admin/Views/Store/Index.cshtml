@@ -1,0 +1,59 @@
+﻿@model IEnumerable<StoreModel>
+@{
+    ViewData["title"] = "Thông tin cửa hàng";
+}
+<h3>Thông tin cửa hàng</h3>
+
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th scope="col">Tên shop</th>
+            <th scope="col">Địa chỉ</th>
+
+            <th scope="col">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@Html.Raw(item.Address)</td>
+                <td>
+                    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Contact">Sửa</a>
+                </td>
+            </tr>
+        }
+
+        @if (ViewBag.Pager != null)
+        {
+            var pager = ViewBag.Pager as Paginate;
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @if (pager.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage - 1)">Trước</a>
+                        </li>
+                    }
+
+                    @for (int i = pager.StartPage; i <= pager.EndPage; i++)
+                    {
+                        <li class="page-item @(i == pager.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="?pg=@i">@i</a>
+                        </li>
+                    }
+
+                    @if (pager.CurrentPage < pager.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="?pg=@(pager.CurrentPage + 1)">Sau</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </tbody>
+</table>

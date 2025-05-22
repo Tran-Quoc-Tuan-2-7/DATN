@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shopping_Tutorial.Repository;
 using Shopping_Tutorial.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shopping_Tutorial.Areas.Admin.Controllers;
 
@@ -22,10 +23,14 @@ public class DashboardController : Controller
         var count_order = _dataContext.Orders.Count();
         var count_category = _dataContext.Categories.Count();
         var count_user = _dataContext.Users.Count();
+
         ViewBag.CountProduct = count_product;
         ViewBag.CountOrder = count_order;
         ViewBag.CountCategory = count_category;
         ViewBag.CountUser = count_user;
+
+        // Truyền danh sách cửa hàng để hiển thị dropdown
+        ViewBag.Stores = _dataContext.Stores.ToList();
 
         return View();
     }
@@ -34,10 +39,10 @@ public class DashboardController : Controller
     public IActionResult GetChartData()
     {
         var data = _dataContext.Statisticals
-            .OrderBy(s => s.DateCreated) // 🟢 Sắp xếp theo ngày tăng dần
+            .OrderBy(s => s.DateCreated)
             .Select(s => new
             {
-                date = s.DateCreated.ToString("dd-MM-yyyy"), // Trả về DateTime gốc
+                date = s.DateCreated.ToString("dd-MM-yyyy"),
                 sold = s.Sold,
                 quantity = s.Quantity,
                 revenue = s.Revenue,
@@ -47,17 +52,24 @@ public class DashboardController : Controller
 
         return Json(data);
     }
-
 
     [HttpPost]
-    public async Task<IActionResult> GetChartDataBySelect(DateTime startDate, DateTime endDate)
+    public IActionResult GetChartDataBySelect(DateTime startDate, DateTime endDate, int storeId = 0)
     {
-        var data = _dataContext.Statisticals
-            .Where(s => s.DateCreated.Date >= startDate.Date && s.DateCreated.Date <= endDate.Date)
-            .OrderBy(s => s.DateCreated) // Sắp xếp để trục X đúng thứ tự
+        var query = _dataContext.Statisticals
+            .Include(s => s.Store) // Nếu bạn có liên kết đến Store
+            .Where(s => s.DateCreated.Date >= startDate.Date && s.DateCreated.Date <= endDate.Date);
+
+        if (storeId != 0)
+        {
+            query = query.Where(s => s.StoreId == storeId);
+        }
+
+        var data = query
+            .OrderBy(s => s.DateCreated)
             .Select(s => new
             {
-                date = s.DateCreated.ToString("dd-MM-yyyy"), // Trả về chuỗi ngày
+                date = s.DateCreated.ToString("dd-MM-yyyy"),
                 sold = s.Sold,
                 quantity = s.Quantity,
                 revenue = s.Revenue,
@@ -67,5 +79,4 @@ public class DashboardController : Controller
 
         return Json(data);
     }
-
 }

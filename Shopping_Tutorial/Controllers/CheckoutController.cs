@@ -27,25 +27,39 @@ public class CheckoutController : Controller
             var ordercode = Guid.NewGuid().ToString();
             var orderItem = new OrderModel();
             orderItem.OrderCode = ordercode;
-            //nhan shipping price
+
+            // Nhan shipping price tu cookie
             var shippingPriceCookie = Request.Cookies["ShippingPrice"];
-            //nhan coupon code
-            var coupon_code = Request.Cookies["CouponTitle"];
             decimal shippingPrice = 0;
             if (shippingPriceCookie != null)
             {
                 var shippingPriceJson = shippingPriceCookie;
                 shippingPrice = JsonConvert.DeserializeObject<decimal>(shippingPriceJson);
             }
-
             orderItem.ShippingCost = shippingPrice;
+
+            // Nhan coupon code tu cookie
+            var coupon_code = Request.Cookies["CouponTitle"];
             orderItem.CouponCode = coupon_code;
+
             orderItem.UserName = userEmail;
             orderItem.Status = 1;
             orderItem.CreatedDate = DateTime.Now;
 
+            // Lay StoreId tu cookie (hoac ban thay bang cach lay khac)
+            var storeIdCookie = Request.Cookies["SelectedStoreId"];
+            int storeId = 1; // mac đinh neu khong co cookie
+            if (storeIdCookie != null && int.TryParse(storeIdCookie, out int parsedStoreId))
+            {
+                storeId = parsedStoreId;
+            }
+            orderItem.StoreId = storeId; // Gan storeId cho don hang
+
+            // Them don hang
             _dataContext.Add(orderItem);
-            _dataContext.SaveChanges();
+            await _dataContext.SaveChangesAsync();
+
+            // Lay danh sach gio hang tu session
             List<CartItemModel> cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart");
 
             foreach (var cart in cartItems)
@@ -57,14 +71,7 @@ public class CheckoutController : Controller
                 orderdetail.Price = cart.Price;
                 orderdetail.Quantity = cart.Quantity;
 
-                ////update product quantity
-                ////var product = await _dataContext.Products.Where(p => p.Id == cart.ProductId).FirstAsync();
-                ////product.Quantity -= cart.Quantity;
-                ////product.Sold += cart.Quantity;
-
-                //_dataContext.Update(product);
                 _dataContext.Add(orderdetail);
-                _dataContext.SaveChanges();
             }
 
             await _dataContext.SaveChangesAsync();
@@ -73,8 +80,6 @@ public class CheckoutController : Controller
 
             TempData["success"] = "Đã tạo đơn hàng thành công";
             return RedirectToAction("History", "Account");
-
         }
     }
 }
-

@@ -23,6 +23,8 @@ namespace Shopping_Tutorial.Repository
         public DbSet<ShippingModel> Shippings { get; set; }
         public DbSet<CouponModel> Coupons { get; set; }
         public DbSet<StatisticalModel> Statisticals { get; set; }
+        public DbSet<StoreModel> Stores { get; set; }
+
 
     }
 }
