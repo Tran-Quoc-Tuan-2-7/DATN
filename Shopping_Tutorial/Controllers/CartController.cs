@@ -20,7 +20,7 @@ public class CartController : Controller
     {
         List<CartItemModel> cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
 
-        //nhan shipping gia tu cookie
+        // Nhận shipping giá từ cookie
         var shippingPriceCookie = Request.Cookies["ShippingPrice"];
         decimal shippingPrice = 0;
         if (shippingPriceCookie != null)
@@ -28,18 +28,49 @@ public class CartController : Controller
             var shippingPriceJson = shippingPriceCookie;
             shippingPrice = JsonConvert.DeserializeObject<decimal>(shippingPriceJson);
         }
-        //nhan coupon code
+
+        // Nhận coupon code
         var coupon_code = Request.Cookies["CouponTitle"];
+
+        // Nếu áp dụng mã FREESHIP, phí vận chuyển = 0
+        if (!string.IsNullOrEmpty(coupon_code) && coupon_code.StartsWith("FREESHIP", StringComparison.OrdinalIgnoreCase))
+        {
+            shippingPrice = 0;
+        }
+
+        decimal grandTotal = cartItems.Sum(x => x.Quantity * x.Price);
+
+        // Nếu áp dụng mã DISCOUNT500K, giảm 500.000đ
+        if (!string.IsNullOrEmpty(coupon_code) && coupon_code.StartsWith("DISCOUNT500K", StringComparison.OrdinalIgnoreCase))
+        {
+            grandTotal -= 500000;
+
+            // Đảm bảo không âm
+            if (grandTotal < 0)
+                grandTotal = 0;
+        }
+
+        if (!string.IsNullOrEmpty(coupon_code) && coupon_code.StartsWith("DISCOUNT200K", StringComparison.OrdinalIgnoreCase))
+        {
+            grandTotal -= 200000;
+
+            // Đảm bảo không âm
+            if (grandTotal < 0)
+                grandTotal = 0;
+        }
 
         CartItemViewModel cartVM = new()
         {
             CartItems = cartItems,
-            GrandTotal = cartItems.Sum(x => x.Quantity * x.Price),
+            GrandTotal = grandTotal,
             ShippingCost = shippingPrice,
             CouponCode = coupon_code
         };
+
         return View(cartVM);
     }
+
+
 
     public IActionResult Checkout()
     {

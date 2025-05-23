@@ -78,8 +78,13 @@ public class CheckoutController : Controller
 
             HttpContext.Session.Remove("Cart");
 
+            Response.Cookies.Delete("ShippingPrice");
+            Response.Cookies.Delete("CouponTitle");
+
             TempData["success"] = "Đã tạo đơn hàng thành công";
+
             return RedirectToAction("History", "Account");
+
         }
     }
 }
