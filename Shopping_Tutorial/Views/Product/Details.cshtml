@@ -19,13 +19,13 @@
 					<h2>@Model.Name</h2>
 					<span>
 						<span>@Model.Price.ToString("#,##0 VNĐ")</span><br />
-						<label>Số lượng:</label>
-						<input type="number" name="quantity" class="input-quantity" value="1" min="1" max="@Model.Quantity" @(Model.Quantity == 0 ? "disabled" : "") />
+						@* <label>Số lượng:</label> *@
+						@* <input type="number" name="quantity" class="input-quantity" value="1" min="1" max="@Model.Quantity" @(Model.Quantity == 0 ? "disabled" : "") /> *@
 						@if (Model.Quantity > 0)
 						{
 							<button type="button" class="btn btn-fefault cart add-to-cart" data-product-id="@Model.Id">
 								<i class="fa fa-shopping-cart"></i>
-								Thêm vào giỏ hàng
+								Thêm giỏ hàng
 							</button>
 						}
 						else

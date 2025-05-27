@@ -1,53 +1,69 @@
 ﻿@model IEnumerable<OrderModel>
 @{
-    ViewData["title"] = "Danh sách lịch sử đơn hàng bỏi" + " " + @ViewBag.UserEmail;
+    ViewData["title"] = "Danh sách lịch sử đơn hàng bởi " + ViewBag.UserEmail;
 }
 <h3>Danh sách lịch sử đơn hàng</h3>
 <table class="table" id="myTable">
     <thead>
         <tr>
             <th scope="col">#</th>
-
             <th scope="col">Code</th>
             <th scope="col">Phí vận chuyển</th>
             <th scope="col">Mã giảm giá</th>
             <th scope="col">UserName</th>
             <th scope="col">Ngày đặt</th>
             <th scope="col">Trạng thái</th>
+            <th scope="col">Bảo hành</th>  <!-- Cột mới -->
             <th scope="col">Hành động</th>
-
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Select((value, index) => new { value, index }))
         {
+            var order = item.value;
+            var index = item.index + 1;
+
             <tr>
-                <th>#</th>
-                <th scope="row">@item.OrderCode</th>
-                <th scope="row">@item.ShippingCost.ToString("#,##0 VNĐ")</th>
-                <th scope="row">@item.CouponCode</th>
-                <td>@item.UserName</td>
-                <td>@Html.Raw(item.CreatedDate)</td>
+                <th scope="row">@index</th>
+                <td>@order.OrderCode</td>
+                <td>@order.ShippingCost.ToString("#,##0 VNĐ")</td>
+                <td>@order.CouponCode</td>
+                <td>@order.UserName</td>
+                <td>@order.CreatedDate.ToString("dd/MM/yyyy")</td>
                 <td>
-                    @if (item.Status == 1)
+                    @if (order.Status == 1)
                     {
                         <span class="text-area text-success">Đơn hàng mới</span>
                     }
-                    else if (item.Status == 2)
+                    else if (order.Status == 2)
                     {
                         <span class="text-area text-primary">Đã xử lí</span>
-
                     }
                     else
                     {
                         <span class="text-area text-danger">Đã hủy</span>
                     }
                 </td>
-
                 <td>
-                    @if (item.Status != 3)
+                    @if (order.Status == 2)  // Chỉ hiển thị khi đơn đã xử lí
                     {
-                        <a asp-action="CancelOrder" class="btn btn-danger btn-sm" asp-controller="Account" asp-route-ordercode="@item.OrderCode">Hủy đơn hàng</a>
+                        var warrantyEndDate = order.CreatedDate.AddYears(2);
+                        var daysLeft = (warrantyEndDate - DateTime.Now).Days;
+
+                        if (daysLeft >= 0)
+                        {
+                            <span class="text-success">Còn @daysLeft ngày</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Hết bảo hành</span>
+                        }
+                    }
+                </td>
+                <td>
+                    @if (order.Status != 3)
+                    {
+                        <a asp-action="CancelOrder" class="btn btn-danger btn-sm" asp-controller="Account" asp-route-ordercode="@order.OrderCode">Hủy đơn hàng</a>
                     }
                 </td>
             </tr>

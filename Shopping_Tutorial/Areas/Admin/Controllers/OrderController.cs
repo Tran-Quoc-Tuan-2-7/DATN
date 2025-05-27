@@ -73,7 +73,6 @@ namespace Shopping_Tutorial.Areas.Admin.Controllers
             if (order == null)
                 return NotFound();
 
-            // Nếu có gửi storeId lên thì kiểm tra và cập nhật
             if (storeId.HasValue && storeId.Value != order.StoreId)
             {
                 var storeExists = await _dataContext.Stores.AnyAsync(s => s.Id == storeId.Value);
@@ -83,7 +82,6 @@ namespace Shopping_Tutorial.Areas.Admin.Controllers
                 order.StoreId = storeId.Value;
             }
 
-            // Cập nhật trạng thái đơn hàng, nếu chuyển sang trạng thái đã xử lý (2)
             if (status == 2 && order.Status != 2)
             {
                 var orderDetails = await _dataContext.OrderDetails
@@ -102,14 +100,36 @@ namespace Shopping_Tutorial.Areas.Admin.Controllers
                     _dataContext.Update(product);
                 }
 
-                // Lấy thống kê theo ngày và cơ sở (store)
+                // Tính toán doanh thu thực tế
+                decimal baseRevenue = orderDetails.Sum(od => od.Quantity * od.Product.Price);
+                decimal shippingCost = order.ShippingCost;
+                decimal discountAmount = 0;
+
+                if (!string.IsNullOrEmpty(order.CouponCode))
+                {
+                    switch (order.CouponCode.ToLower())
+                    {
+                        case "discount500k":
+                            discountAmount = 500000;
+                            break;
+                        case "discount200k":
+                            discountAmount = 200000;
+                            break;
+                        case "freeship":
+                            shippingCost = 0;
+                            break;
+                    }
+                }
+
+                decimal totalRevenue = baseRevenue + shippingCost - discountAmount;
+                decimal totalProfit = orderDetails.Sum(od => (od.Product.Price / 5) * od.Quantity); // giữ nguyên
+
+                // Cập nhật thống kê
                 var statistical = await _dataContext.Statisticals
                     .FirstOrDefaultAsync(s => s.DateCreated.Date == order.CreatedDate.Date && s.StoreId == order.StoreId);
 
                 int totalQuantity = orderDetails.Count;
                 int totalSold = orderDetails.Sum(od => od.Quantity);
-                decimal totalRevenue = orderDetails.Sum(od => od.Quantity * od.Product.Price);
-                decimal totalProfit = orderDetails.Sum(od => (od.Product.Price / 5) * od.Quantity);
 
                 if (statistical != null)
                 {
