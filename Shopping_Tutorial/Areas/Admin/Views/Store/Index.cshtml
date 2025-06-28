@@ -3,6 +3,9 @@
     ViewData["title"] = "Thông tin cửa hàng";
 }
 <h3>Thông tin cửa hàng</h3>
+<a asp-action="Create" asp-controller="Store" class="btn btn-primary">
+    <i class="fa fa-plus"></i>Thêm cửa hàng
+</a>
 
 <table class="table" id="myTable">
     <thead>
@@ -22,7 +25,8 @@
                 <td>@item.Name</td>
                 <td>@Html.Raw(item.Address)</td>
                 <td>
-                    <a asp-action="Edit" class="btn btn-warning btn-sm" asp-controller="Contact">Sửa</a>
+                    <a asp-action="Edit" asp-controller="Store" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Sửa</a>
+                    <a asp-action="Delete" class="btn btn-danger btn-sm confirmDeletion" asp-controller="Store" asp-route-Id="@item.Id">Xóa</a>
                 </td>
             </tr>
         }
